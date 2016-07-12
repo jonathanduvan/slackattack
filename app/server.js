@@ -120,6 +120,6 @@ controller.hears(['hello', 'hi', 'howdy', 'hey'], ['direct_message', 'direct_men
 });
 
 // based off code in https://github.com/howdyai/botkit#botreply
-controller.hears(['going', 'whats'], ['message_received'], function (bot, message) {
+controller.hears(['going', 'whats'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
   bot.reply(message, 'Just chilling!');
 });
