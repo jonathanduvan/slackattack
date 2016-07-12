@@ -106,8 +106,16 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
 
 
 controller.on('outgoing_webhook', (bot, message) => {
-  bot.replyPublic(message, 'yeah yeah');
+  const sleepMessage = {
+    'text': 'I have been summoned',
+    'attachments': [{
+      'text': '',
+      'image_url': 'http://gph.is/1ISgpO2',
+    }],
+  };
+  bot.replyPublic(message, sleepMessage);
 });
+
 
 // example hello response
 controller.hears(['hello', 'hi', 'howdy', 'hey'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
