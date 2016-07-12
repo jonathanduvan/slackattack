@@ -59,7 +59,6 @@ controller.hears(['food', 'hungry', 'eat'], ['direct_message', 'direct_mention',
 
                   // Information for user was found
                   .then((data) => {
-                    convo.say('I found something!');
                     bot.reply(message,
                       {
                         text: 'This is definitely what I recommend:',
