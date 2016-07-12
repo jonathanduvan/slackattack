@@ -28,59 +28,11 @@ const yelp = new Yelp({
   token_secret: process.env.YELP_TOKEN_SECRET,
 });
 
-/*
-// Do a yelp search then present the information to the user
-const yelpSearch = (response, convo) => {
-  const foodSearch = convo.extractResponse('foodTypeYelp');
-  const citySearch = convo.extractResponse('yelpLocationResponse');
-  convo.say(citySearch);
-
-  yelp.search({ term: foodSearch, location: citySearch, limit: 1 })
-  .then((data) => {
-    convo.say('I found something!');
-    bot.reply(response,
-      {
-        text: 'This is definitely what I recommend:',
-        attachments: [
-          {
-            title: `${data.businesses[0].name}`,
-            title_link: `${data.businesses[0].url}`,
-            text: `${data.businesses[0].snippet_text}`,
-            image_url: `${data.businesses[0].image_url}`,
-          },
-        ],
-      });
-  })
-
-  .catch((err) => {
-    console.log(err);
-    convo.say('I am sorry to inform you that there is nothing in your area');
-  });
-};
-
-// Ask where the user is located
-const askLocation = (response, convo) => {
-  const yelpLocationResponse = { key: 'yelpLocationResponse', multiple: false };
-  convo.ask('What town and state are you in, my friend?', () => {
-    yelpSearch(response, convo);
-    convo.next();
-  }, yelpLocationResponse);
-};
-
-// Ask what type of food the user wants
-const askFoodType = (response, convo) => {
-  const FoodTypeAnswer = { key: 'foodTypeYelp', multiple: false };
-  convo.ask('What type of food are you hungry for buddy?', () => {
-    convo.say('You chose wisely.');
-    askLocation(response, convo);
-    convo.next();
-  }, FoodTypeAnswer);
-};
-
-*/
+// Controller hears for food request stuff, information based off of https://github.com/howdyai/botkit/blob/master/readme.md#receiving-messages
 controller.hears(['food', 'hungry', 'eat'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
   // start a conversation to handle this response.
   bot.startConversation(message, function (err, convo) {
+    // Ask if the user wants help
     convo.ask('Would you like food recommendations near you?', [
       {
         pattern: bot.utterances.yes,
@@ -90,22 +42,20 @@ controller.hears(['food', 'hungry', 'eat'], ['direct_message', 'direct_mention',
 
           const FoodRequest = { key: 'foodTypeYelp', multiple: false };
           convo.ask('What type of food are you hungry for buddy?', (response) => {
-            // askLocation(response, convo);
+            const UserLocation = { key: 'UserLocation', multiple: false };
 
-            // (response, convo) => {
-            const yelpLocationResponse = { key: 'yelpLocationResponse', multiple: false };
-              // let foodType = convo.extractResponse('foodTypeYelp');
-              // convo.say(foodType);
             convo.say(convo.extractResponse('foodTypeYelp'));
             convo.next();
 
             convo.ask('What town and state are you hoping to eat in, my friend?',
-                // yelpSearch(response, convo);
+
                 () => {
                   const YelpFoodSearch = convo.extractResponse('foodTypeYelp');
-                  const YelpCitySearch = convo.extractResponse('yelpLocationResponse');
+                  const YelpCitySearch = convo.extractResponse('UserLocation');
 
                   yelp.search({ term: YelpFoodSearch, location: YelpCitySearch, limit: 1 })
+
+                  // Information for user was found
                   .then((data) => {
                     convo.say('I found something!');
                     bot.reply(message,
@@ -121,20 +71,20 @@ controller.hears(['food', 'hungry', 'eat'], ['direct_message', 'direct_mention',
                         ],
                       });
                   })
+
+                  // Information was not found
                   .catch((err) => {
                     convo.say('I am sorry to inform you that there is nothing in your area');
                   });
                   convo.next();
-
-
-                  // convo.next();
-                }, yelpLocationResponse);
+                }, UserLocation);
             convo.next();
           }, FoodRequest);
           convo.next();
         },
       },
       {
+        // user did not want help
         pattern: bot.utterances.no,
         callback(response, convo) {
           convo.say('Perhaps later, see ya!');
@@ -153,6 +103,11 @@ controller.setupWebserver(process.env.PORT || 3001, (err, webserver) => {
   });
 });
 
+
+controller.on('outgoing_webhook', (bot, message) => {
+  bot.replyPublic(message, 'yeah yeah');
+});
+
 // example hello response
 controller.hears(['hello', 'hi', 'howdy', 'hey'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
   bot.api.users.info({ user: message.user }, (err, res) => {
@@ -162,4 +117,9 @@ controller.hears(['hello', 'hi', 'howdy', 'hey'], ['direct_message', 'direct_men
       bot.reply(message, 'Hello there!');
     }
   });
+});
+
+// based off code in https://github.com/howdyai/botkit#botreply
+controller.hears(['going', 'whats'], ['message_received'], function (bot, message) {
+  bot.reply(message, 'Just chilling!');
 });
