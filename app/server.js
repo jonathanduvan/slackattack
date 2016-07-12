@@ -40,13 +40,15 @@ controller.hears(['food', 'hungry', 'eat'], ['direct_message', 'direct_mention',
           convo.say('Brilliant');
           convo.next();
 
+          // ask for type of food
           const FoodRequest = { key: 'foodTypeYelp', multiple: false };
           convo.ask('What type of food are you hungry for buddy?', (response) => {
             const UserLocation = { key: 'UserLocation', multiple: false };
 
-            convo.say(convo.extractResponse('foodTypeYelp'));
+            convo.say('You chose wisely');
             convo.next();
 
+            // ask for location
             convo.ask('What town and state are you hoping to eat in, my friend?',
 
                 () => {
