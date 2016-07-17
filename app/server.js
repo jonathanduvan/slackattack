@@ -132,7 +132,3 @@ controller.hears(['hello', 'hi', 'howdy', 'hey'], ['direct_message', 'direct_men
 controller.hears(['going', 'whats'], ['direct_message', 'direct_mention', 'mention'], (bot, message) => {
   bot.reply(message, 'Just chilling!');
 });
-
-controller.hears(['wake up jon_bot', 'Botty wake up', 'Wake up Mr.McBotFace!'], ['direct_message', 'direct_mention', 'mention', 'message_received'], (bot, message) => {
-  bot.replyPublic(message, 'I have been summoned');
-});
